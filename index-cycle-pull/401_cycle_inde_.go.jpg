@@ -1,0 +1,57 @@
+package main
+
+import (
+	"fmt"
+	"io/fs"
+	"io/ioutil"
+	"log"
+	"path/filepath"
+	"strings"
+)
+
+func listOfFileNames(files []fs.FileInfo) map[string]string {
+	var mp = make(map[string]string)
+	// var ans = make([]string, 0)
+	var ind int
+	for _, file := range files {
+		ind++
+		f := strings.Split(file.Name(), "_")
+		sufix := f[0][:(len(f[0]) - 4)]
+		epNum := f[0][(len(f[0]) - 3):]
+		k := fmt.Sprintf("%03d_cycle_%s_%s.jpg", ind, sufix, epNum)
+		mp[k] = file.Name()
+		// mp[k] = append(mp[k], file.Name())
+		// ans = append(ans, file.Name())
+	}
+	return mp
+}
+
+func copyToPull(mp map[string]string) {
+
+	for key, file := range mp {
+		// for _, v := range files {
+		in, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+		// fmt.Println(in)
+		err = ioutil.WriteFile(filepath.Join("..", "index-cycle-pull", key), in, 0644)
+		if err != nil {
+			fmt.Println("Error creating", filepath.Join("..", "index-cycle-pull", key))
+			fmt.Println(err)
+			return
+		}
+	}
+}
+
+func main() {
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+	listOfFileNames(files)
+	fmt.Println(len(listOfFileNames(files)))
+	// fmt.Println(listOfFileNames(files))
+	copyToPull(listOfFileNames(files))
+}
