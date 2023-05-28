@@ -1,2 +1,2 @@
 # Random-Statistics-Sample
-Sampel for t-Test, ANOVA
+Sample for t-Test, ANOVA
